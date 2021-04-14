@@ -2,7 +2,6 @@ const mongoose=require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-require('dotenv').config()
 
 const userSchema = new mongoose.Schema({
     
@@ -40,6 +39,26 @@ const userSchema = new mongoose.Schema({
             }
         }
     },
+    isVerified: {
+        type: Boolean,
+        default: false,
+    },
+    identifiedAs:{
+        type:String,
+        lowercase:true,
+        trim:true,
+        default:null
+    },
+    interest:[{
+        type:String,
+        lowercase:true,
+        trim:true
+    }],
+    domain:[{
+        type:String,
+        lowercase:true,
+        trim:true
+    }],
     tokens:[{
         token:{
             type:String,
@@ -75,7 +94,7 @@ userSchema.methods.generateAuthToken = async function (){
 userSchema.statics.findByCredentials = async (email,password)=>{
     const user = await User.findOne({email})
     if(!user){
-        throw new Error('Unable to login')
+        throw new Error('User not found')
     }
     const isMatch = await bcrypt.compare(password,user.password)
     if(!isMatch){
