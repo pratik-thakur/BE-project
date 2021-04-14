@@ -18,7 +18,7 @@ const sendverifyEmail = (email,name,host,id)=>{
         to: email,
         subject: 'Account Verification Link',
         text: 'Hello ' + name + ',\n\n' +
-            'Please verify your account by clicking the link: \nhttp:\/\/' +
+            'Please verify your account by clicking the link: \nhttps:\/\/' +
             host + '\/confirmation\/' +
             token + '\n\nThank You!\n'
     };
