@@ -31,7 +31,7 @@ const sendverifyEmail = (email,name,host,id)=>{
         {
             const msg =({msg:'A verification email has been sent to ' + email + '. It will expire after one day. If you have not got verification Email click on resend token.'});
             //console.log(msg)
-            return {msg,token};
+            return ({msg,token});
         }
         
     });

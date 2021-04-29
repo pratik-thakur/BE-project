@@ -14,8 +14,9 @@ router.post('/register',async (req,res)=>{
         //console.log(user._id,req.headers.host)
         await user.save()    
         const msg = sendverifyEmail(user.email,user.name,req.headers.host,user._id)
+        const token = jwt.sign({_id : user._id.toString()},process.env.JWT_SECRET)
        // const token = await user.generateAuthToken()
-        res.send({user,msg})
+        res.send({user,msg,token})
     }catch(e){
         res.status(400).send(e)
     }
