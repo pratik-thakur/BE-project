@@ -13,10 +13,9 @@ router.post('/register',async (req,res)=>{
     try{
         //console.log(user._id,req.headers.host)
         await user.save()    
-        const msg = sendverifyEmail(user.email,user.name,req.headers.host,user._id)
-        const token = jwt.sign({_id : user._id.toString()},process.env.JWT_SECRET)
-       // const token = await user.generateAuthToken()
-        res.send({user,msg,token})
+        sendverifyEmail(user.email,user.name,req.headers.host,user._id)
+        .then((result) => res.send({user, result}))
+        .catch((error) => res.send({user,error}));
     }catch(e){
         res.status(400).send(e)
     }
@@ -74,7 +73,6 @@ router.get('/confirmation/:token',async(req,res)=>{
         }
         user.isVerified = true;
         await user.save() 
-        //console.log("xsxsxyyyy")
         res.send({msg:"Congralutaions!! Your account has been successfully verified"})
     }catch(e){
         res.status(400).send({e,error:"Invalid Token please regenerate the verification link"})
@@ -89,11 +87,11 @@ router.post('/resendVerificationLink',async(req,res)=>{
             return res.status(400).send({ msg: 'We were unable to find a user with that email. Make sure your Email is correct!' });
         }
         else if (user.isVerified) {
-            return res.status(200).send('This account has been already verified. Please log in.');
+            return res.status(200).send({msg:'This account has been already verified. Please log in.'});
         }
-        const msg = await sendverifyEmail(user.email,user.name,req.headers.host,user._id)
-        //console.log(msg)
-        res.send(msg)
+        sendverifyEmail(user.email,user.name,req.headers.host,user._id)
+        .then((result) => res.send({user, result}))
+        .catch((error) => res.send({user,error}));
 
     }catch(e){
         res.status(400).send(e)
