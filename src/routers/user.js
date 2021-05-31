@@ -10,6 +10,10 @@ router.post('/register',async (req,res)=>{
     delete req.body.isVerified
     const user = new User(req.body)
     //console.log(req.body)
+    if(!req.body.password)
+    {
+        return res.status(400).send({msg:'Please Enter Password'})
+    }
     try{
         //console.log(user._id,req.headers.host)
         await user.save()    
@@ -17,7 +21,7 @@ router.post('/register',async (req,res)=>{
         .then((result) => res.send({user, result}))
         .catch((error) => res.send({user,error}));
     }catch(e){
-        res.status(400).send(e)
+        res.status(400).send({e,msg:'Please enter a unique username and Email'})
     }
 })
 
@@ -117,7 +121,8 @@ router.delete('/users/me',auth,async(req,res)=>{
 //update  user
 router.patch('/users/me',auth,async(req,res)=>{
     const updates = Object.keys(req.body)
-    const allowedUpdates =['name','password','domain','interest','identifiedAs']
+    const allowedUpdates =['name','password','domain','interest','identifiedAs','contact','social','description','profilePic', 'points','rank','contribution']
+    //console.log(updates,allowedUpdates)
     const isValidOperation = updates.every((update)=>{
         return allowedUpdates.includes(update)
     })

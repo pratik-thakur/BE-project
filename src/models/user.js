@@ -2,13 +2,15 @@ const mongoose=require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const uniqueValidator = require('mongoose-unique-validator')
 
 const userSchema = new mongoose.Schema({
     
     username: {
         type: String,
-        required: "username is required!",
         unique: true,
+        required: "username is required!"
+        
     },
     name:{
         type:String,
@@ -27,9 +29,14 @@ const userSchema = new mongoose.Schema({
             }
         }
     },
+    contact:{
+        type:Number,
+        trime:true,
+        minlength:10,
+        maxlength:10
+    },
     password:{
         type:String,
-        required:true,
         minlength:7,
         trim:true,
         validate(value){
@@ -59,6 +66,57 @@ const userSchema = new mongoose.Schema({
         lowercase:true,
         trim:true
     }],
+    social:[{
+        _id:false,
+        site:String,
+        link:String
+    }],
+    description:{
+        type:String,
+        trime:true
+    },
+    profilePic:{
+        type:String,
+        trime:true
+    },
+    points:{
+        type:Number,
+        default:0,
+        trime:true
+    },
+    rank:{
+        type:Number,
+        default:0,
+        trime:true
+    },
+    saved:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Posts'
+    }],
+    repoCreated:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Repos'
+    }],
+    groupJoined:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Groups'
+    }],
+    pending:[{
+        type:mongoose.Schema.Types.ObjectId,
+    }],
+    completed:[{
+        type:mongoose.Schema.Types.ObjectId,
+    }],
+    contribution:[{
+        _id:false,
+        date:{
+            type:Date
+        },
+        numContribution:{
+            type:Number,
+            Default:0
+        }
+    }],
     tokens:[{
         token:{
             type:String,
@@ -70,6 +128,7 @@ const userSchema = new mongoose.Schema({
     timestamps:true
 })
 
+userSchema.plugin(uniqueValidator);
 //instance methods
 
 userSchema.methods.toJSON = function(){
