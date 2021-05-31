@@ -69,11 +69,11 @@ router.get('/confirmation/:token',async(req,res)=>{
         }
         if(user.isVerified)
         {
-            return res.status(200).send({msg:"This account is already verified"})
+            return res.status(200).send({msg:"This account is already verified",key:100})
         }
         user.isVerified = true;
         await user.save() 
-        res.send({msg:"Congralutaions!! Your account has been successfully verified"})
+        res.send({msg:"Congralutaions!! Your account has been successfully verified",key:200})
     }catch(e){
         res.status(400).send({e,error:"Invalid Token please regenerate the verification link"})
     }
