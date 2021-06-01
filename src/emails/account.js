@@ -15,7 +15,7 @@ const oAuth2Client = new google.auth.OAuth2(
 );
 oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
 
-async function sendverifyEmail(email,name,host,id) {
+async function sendverifyEmail(email,name,host,token) {
   try {
     const accessToken = await oAuth2Client.getAccessToken();
 
@@ -30,7 +30,7 @@ async function sendverifyEmail(email,name,host,id) {
         accessToken: accessToken,
       },
     });
-    const token = jwt.sign({_id : id.toString()},process.env.JWT_SECRET)
+    
     const mailOptions = {
       from: 'BE Project <beprojectvps@gmail.com>',
         to: email,
@@ -38,7 +38,73 @@ async function sendverifyEmail(email,name,host,id) {
         text: 'Hello ' + name + ',\n\n' +
             'Please verify your account by clicking the link: \nhttps:\/\/' +
             host + '\/confirmation\/' +
-            token + '\n\nThank You!\n'
+            token + '\nThis token is valid for 15 minutes and can be used only one time.\nThank You!\n'
+    };
+
+    const result = await transport.sendMail(mailOptions);
+    return result;
+  } catch (error) {
+    return error;
+  }
+}
+
+async function resetPasswordEmail(email,name,host,token) {
+  try {
+    const accessToken = await oAuth2Client.getAccessToken();
+
+    const transport = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        type: 'OAuth2',
+        user: 'beprojectvps@gmail.com',
+        clientId: CLIENT_ID,
+        clientSecret: CLEINT_SECRET,
+        refreshToken: REFRESH_TOKEN,
+        accessToken: accessToken,
+      },
+    });
+    
+    const mailOptions = {
+      from: 'BE Project <beprojectvps@gmail.com>',
+        to: email,
+        subject: 'Reset Password',
+        text: 'Hello ' + name + ',\n\n' +
+            'Reset the password by clicking the link: \nhttps:\/\/' +
+            host + '\/resetPassword\/' +
+            token + '\nThis token is valid for 15 minutes and can be used only one time.\nThank You!\n'
+    };
+
+    const result = await transport.sendMail(mailOptions);
+    return result;
+  } catch (error) {
+    return error;
+  }
+}
+
+async function deleteProfileEmail(email,name,host,token) {
+  try {
+    const accessToken = await oAuth2Client.getAccessToken();
+
+    const transport = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        type: 'OAuth2',
+        user: 'beprojectvps@gmail.com',
+        clientId: CLIENT_ID,
+        clientSecret: CLEINT_SECRET,
+        refreshToken: REFRESH_TOKEN,
+        accessToken: accessToken,
+      },
+    });
+    
+    const mailOptions = {
+      from: 'BE Project <beprojectvps@gmail.com>',
+        to: email,
+        subject: 'Delete Account',
+        text: 'Hello ' + name + ',\n\n' +
+            'It was a great journey with you . Hope to see you soon \nYour account will be permanently deleted it cannot be recovered by clicking the link: \nhttps:\/\/' +
+            host + '\/users\/' +
+            token + '\nThis token is valid for 15 minutes and can be used only one time.\nThank You!\n'
     };
 
     const result = await transport.sendMail(mailOptions);
@@ -49,5 +115,7 @@ async function sendverifyEmail(email,name,host,id) {
 }
 
 module.exports={
-    sendverifyEmail
+    sendverifyEmail,
+    resetPasswordEmail,
+    deleteProfileEmail
 }

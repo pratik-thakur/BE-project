@@ -114,9 +114,12 @@ const userSchema = new mongoose.Schema({
         },
         numContribution:{
             type:Number,
-            Default:0
+            default:0
         }
     }],
+    impToken:{
+        type:String
+    },
     tokens:[{
         token:{
             type:String,
@@ -135,6 +138,7 @@ userSchema.methods.toJSON = function(){
     const user =this
     const userObject = user.toObject()
 
+    delete userObject.impToken
     delete userObject.password
     delete userObject.tokens
 
