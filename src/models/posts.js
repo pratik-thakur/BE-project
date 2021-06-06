@@ -17,6 +17,7 @@ const postSchema = new mongoose.Schema({
         required:true,
         trim:true
     },
+    tags:[String],
     like:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User'
@@ -25,8 +26,11 @@ const postSchema = new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:'User'
     }],
+    support:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'User'
+    }],
     comments:[{
-        _id:false,
         user:{
             type:mongoose.Schema.Types.ObjectId,
             ref:'User'
@@ -34,10 +38,6 @@ const postSchema = new mongoose.Schema({
         comment:String
     }],
     numShare:{
-        type:Number,
-        default:0
-    },
-    numSupport:{
         type:Number,
         default:0
     },

@@ -141,6 +141,7 @@ userSchema.methods.toJSON = function(){
     delete userObject.impToken
     delete userObject.password
     delete userObject.tokens
+    delete userObject._id
 
     return userObject
 }
@@ -176,7 +177,6 @@ userSchema.pre('save',async function(next){
     //console.log('just before saving')
     next()
 })
-
 
 
 const User = mongoose.model('User',userSchema)

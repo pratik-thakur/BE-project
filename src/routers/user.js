@@ -189,9 +189,12 @@ router.post('/resetPassword/:token',async(req,res)=>{
 })
 
 //update  user
+// as soon as person will login vishal will get all the data of that particular user on frontend then when ever he updates
+//anything even array you will push data or pop data from array and send the update request by sending updated array in request body
+//'contribution','repoCreated','groupJoined','pending','completed' remaning for update logic
 router.patch('/users/me',auth,async(req,res)=>{
     const updates = Object.keys(req.body)
-    const allowedUpdates =['name','domain','interest','identifiedAs','contact','social','description','profilePic', 'points','rank','contribution']
+    const allowedUpdates =['name','domain','interest','identifiedAs','contact','social','description','profilePic', 'points','rank','saved']
     //console.log(updates,allowedUpdates)
     const isValidOperation = updates.every((update)=>{
         return allowedUpdates.includes(update)
