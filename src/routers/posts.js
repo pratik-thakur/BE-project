@@ -35,28 +35,26 @@ router.get('/post/:id',async(req,res)=>{
 //Recent Post , all the post , Pagantion , post of a specific user
 //GET /post?author=id
 //GET/post?limit=10&skip=20
-//Get/post?sortBy=cretedAt_asc
-router.get('/post',async(req,res)=>{
+//Get/post?sortBy=cretedAt:desc  for recent post
+router.get('/posts',async(req,res)=>{
     const match ={}
     const sort={}
     if(req.query.author)
     {
-        match.author=request.query.author
+        match.author=req.query.author
     }
     if(req.query.sortBy){
         const parts=req.query.sortBy.split(':')
         sort[parts[0]] = parts[1] === 'desc' ? -1:1
     }
-    const options={
-        limit:parseInt(req.query.limit),
-        skip:parseInt(req.query.skip),
-        sort
-     }
     try{
-       const posts=await Posts.find({match,options})
+       const posts=await Posts.find(match)
+       .limit(parseInt(req.query.limit))
+       .skip(parseInt(req.query.skip))
+       .sort(sort)
         res.send(posts)
     }catch(e){
-        res.status(500).send()
+        res.status(500).send(e)
     }
 })
 
@@ -91,9 +89,15 @@ router.patch('/updateComment/:id',auth,async(req,res)=>{
             return res.status(404).send()
         }
         post.comments.map(comment => {
-            if(comment._id === req.body.id && comment.user===req.user._id)
+            // console.log(comment , req.body.id, req.user._id )
+            // console.log(comment._id == req.body.id ,comment.user==req.user._id)
+            // console.log(typeof(comment.user),typeof(req.user._id))
+            if(comment._id == req.body.id && JSON.stringify(comment.user) == JSON.stringify(req.user._id))
             {
+                //console.log(comment.comment)
                 comment.comment = req.body.comment
+                //console.log(comment.comment)
+                
             }
         })
         await post.save()
