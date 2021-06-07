@@ -129,13 +129,19 @@ router.patch('/deleteComment/:id',auth,async(req,res)=>{
         if(!post){
             return res.status(404).send()
         }
-        if(req.user._id === post.author)
+        if(JSON.stringify(req.user._id) == JSON.stringify(post.author))
         {
             post.comments = post.comments.filter(comment => comment._id!=req.body.id)
+            //console.log(post.comments)
         }
         else
         {
-            post.comments = post.comments.filter(comment => (comment._id!=req.body.id || comment.user!=req.user._id))
+            post.comments = post.comments.filter(comment =>
+                {
+                    //console.log(comment.comment,comment._id!=req.body.id,JSON.stringify(comment.user)!=JSON.stringify(req.user._id),(comment._id!=req.body.id && comment.user!=req.user._id))
+                    return (comment._id!=req.body.id || JSON.stringify(comment.user)!=JSON.stringify(req.user._id))
+                } )
+            //console.log(post.comments)
         }
         await post.save()
         res.send(post)
@@ -166,10 +172,10 @@ router.patch('/savePost/:id',auth,async(req,res)=>{
         if(!post){
             return res.status(404).send()
         }
-        const found = req.user.saved.some(id=>id===req.params.id)
+        const found = req.user.saved.some(id=>JSON.stringify(id)===JSON.stringify(req.params.id))
         if(!found)
         {
-            req.user.saved.push(req.user._id)
+            req.user.saved.push(req.params.id)
             const numsv = post.numSave +1
             post.numSave = numsv
             await post.save()
@@ -188,12 +194,12 @@ router.patch('/likePost/:id',auth,async(req,res)=>{
         if(!post){
             return res.status(404).send()
         }
-        const newdislike = post.dislike.filter(id => id!=req.user._id)
+        const newdislike = post.dislike.filter(id => JSON.stringify(id)!=JSON.stringify(req.user._id))
         post.dislike = newdislike
-        const found = post.like.some(id=>id===req.user._id)
+        const found = post.like.some(id=>JSON.stringify(id)===JSON.stringify(req.user._id))
         if(!found)
         {
-            post.like.push(req.user._id)
+            post.like.push(req.user._id) 
         }
         await post.save()
         res.send(post)
@@ -208,9 +214,9 @@ router.patch('/dislikePost/:id',auth,async(req,res)=>{
         if(!post){
             return res.status(404).send()
         }
-        const newlike = post.like.filter(id => id!=req.user._id)
+        const newlike = post.like.filter(id => JSON.stringify(id)!=JSON.stringify(req.user._id))
         post.like = newlike
-        const found = post.dislike.some(id=>id===req.user._id)
+        const found = post.dislike.some(id=>JSON.stringify(id)===JSON.stringify(req.user._id))
         if(!found)
         {
             post.dislike.push(req.user._id)
@@ -228,12 +234,12 @@ router.patch('/supportPost/:id',auth,async(req,res)=>{
         if(!post){
             return res.status(404).send()
         }
-        const found = post.support.some(id=>id===req.user._id)
+        const found = post.support.some(id=>JSON.stringify(id)===JSON.stringify(req.user._id))
         if(!found)
         {
             post.support.push(req.user._id)
+            await post.save()
         }
-        await post.save()
         res.send(post)
     }catch(e){
         res.status(400).send(e)
