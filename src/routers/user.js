@@ -21,8 +21,8 @@ router.post('/register',async (req,res)=>{
         await user.save()
         
         sendverifyEmail(user.email,user.name,req.headers.host,token)
-        .then((result) => res.send({user, result}))
-        .catch((error) => res.send({user,error}));
+        .then((result) => res.send({msg:"Congratulations User registered Successfully Please verify the Email",result}))
+        .catch((error) => res.send({msg:"User registered Successfully unable to send the mail due to technical issues",error}));
     }catch(e){
         res.status(400).send({e,msg:'Please enter a unique username and Email'})
     }
@@ -105,7 +105,7 @@ router.post('/resendVerificationLink',async(req,res)=>{
         const token = jwt.sign({_id : user._id.toString()},process.env.JWT_SECRET,{expiresIn:'900 seconds'})
         user.impToken=token
         await user.save()
-        sendverifyEmail(user.email,user.name,req.headers.host,user._id)
+        sendverifyEmail(user.email,user.name,req.headers.host,token)
         .then((result) => res.send({result}))
         .catch((error) => res.send({error}));
 
@@ -223,6 +223,21 @@ router.patch('/users/me',auth,async(req,res)=>{
 router.get('/users/:username',async(req,res)=>{
     try{
         const user = await User.findOne({username:req.params.username})
+        if(!user)
+        {
+            return res.status(404).send({error:"User not found"})
+        }
+        res.send(user)
+    }catch(e)
+    {
+        res.status(400).send({e,error:"User not found"})
+    }
+    
+})
+
+router.get('/user/:id',async(req,res)=>{
+    try{
+        const user = await User.findById(req.params.id)
         if(!user)
         {
             return res.status(404).send({error:"User not found"})
